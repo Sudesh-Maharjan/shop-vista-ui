@@ -13,6 +13,19 @@ import HomePage from "./pages/public/home";
 import ProductListingPage from "./pages/public/product-listing";
 import ProductDetailPage from "./pages/public/product-detail";
 import SearchPage from "./pages/public/search";
+import CartPage from "./pages/public/cart";
+import CheckoutPage from "./pages/public/checkout";
+import OrderConfirmationPage from "./pages/public/order-confirmation";
+import WishlistPage from "./pages/public/wishlist";
+import ProfilePage from "./pages/public/profile";
+
+// Admin pages
+import AdminDashboardPage from "./pages/admin/dashboard";
+import AdminProductsPage from "./pages/admin/products";
+import AdminOrdersPage from "./pages/admin/orders";
+import AdminCustomersPage from "./pages/admin/customers";
+import AdminCouponsPage from "./pages/admin/coupons";
+import AdminSettingsPage from "./pages/admin/settings";
 
 // Other pages
 import NotFound from "./pages/NotFound";
@@ -25,33 +38,22 @@ const PlaceholderPage = ({ title }: { title: string }) => (
   </div>
 );
 
-// Public pages
-const CartPage = () => <PlaceholderPage title="Shopping Cart" />;
-const CheckoutPage = () => <PlaceholderPage title="Checkout" />;
-const OrderConfirmationPage = () => <PlaceholderPage title="Order Confirmation" />;
-const OrderTrackingPage = () => <PlaceholderPage title="Order Tracking" />;
-
 // Auth pages
 const LoginPage = () => <PlaceholderPage title="Login" />;
 const RegisterPage = () => <PlaceholderPage title="Register" />;
 
-// User account pages
-const ProfilePage = () => <PlaceholderPage title="User Profile" />;
+// User account pages (some implemented, others as placeholders)
 const OrdersPage = () => <PlaceholderPage title="My Orders" />;
 const OrderDetailPage = () => <PlaceholderPage title="Order Details" />;
-const WishlistPage = () => <PlaceholderPage title="My Wishlist" />;
 const AddressesPage = () => <PlaceholderPage title="My Addresses" />;
 const ChangePasswordPage = () => <PlaceholderPage title="Change Password" />;
 
-// Admin pages
-const AdminDashboardPage = () => <PlaceholderPage title="Admin Dashboard" />;
-const AdminProductsPage = () => <PlaceholderPage title="Product Management" />;
+// Placeholder for admin pages that need completion
 const AdminProductFormPage = () => <PlaceholderPage title="Add/Edit Product" />;
-const AdminOrdersPage = () => <PlaceholderPage title="Order Management" />;
 const AdminOrderDetailPage = () => <PlaceholderPage title="Order Details" />;
-const AdminCustomersPage = () => <PlaceholderPage title="Customer Management" />;
-const AdminCouponsPage = () => <PlaceholderPage title="Coupon Management" />;
-const AdminSettingsPage = () => <PlaceholderPage title="Admin Settings" />;
+
+// For tracking pages
+const OrderTrackingPage = () => <PlaceholderPage title="Order Tracking" />;
 
 const queryClient = new QueryClient();
 
@@ -108,11 +110,6 @@ const App = () => {
               <Route path="/account/orders/:id" element={
                 <ProtectedRoute>
                   <OrderDetailPage />
-                </ProtectedRoute>
-              } />
-              <Route path="/account/wishlist" element={
-                <ProtectedRoute>
-                  <WishlistPage />
                 </ProtectedRoute>
               } />
               <Route path="/account/addresses" element={
