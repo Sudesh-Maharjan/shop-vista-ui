@@ -1,0 +1,313 @@
+
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { 
+  Search, ShoppingCart, User, Menu, X, Heart, Bell, ChevronDown
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuSeparator, 
+  DropdownMenuTrigger 
+} from '@/components/ui/dropdown-menu';
+import { Badge } from '@/components/ui/badge';
+import { categories } from '@/lib/data';
+
+interface NavbarProps {
+  isAuthenticated?: boolean;
+  userName?: string;
+  cartItemCount?: number;
+  onSearchSubmit?: (query: string) => void;
+}
+
+export function Navbar({ 
+  isAuthenticated = false, 
+  userName = 'Guest', 
+  cartItemCount = 0,
+  onSearchSubmit
+}: NavbarProps) {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [showSearchBar, setShowSearchBar] = useState(false);
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (onSearchSubmit && searchQuery.trim()) {
+      onSearchSubmit(searchQuery);
+    }
+  };
+
+  return (
+    <header className="sticky top-0 z-50 w-full bg-white border-b shadow-sm">
+      {/* Top bar with logo and search on desktop */}
+      <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+        {/* Logo */}
+        <Link to="/" className="flex items-center gap-2">
+          <span className="text-2xl font-bold text-primary">ShopVista</span>
+        </Link>
+
+        {/* Search bar - Desktop only */}
+        <form 
+          onSubmit={handleSearchSubmit} 
+          className="hidden md:flex flex-1 max-w-md mx-4"
+        >
+          <div className="relative flex w-full">
+            <Input
+              type="search"
+              placeholder="Search products..."
+              className="w-full pr-10"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <Button 
+              type="submit" 
+              size="icon" 
+              variant="ghost" 
+              className="absolute right-0 top-0 h-full"
+            >
+              <Search className="h-5 w-5" />
+            </Button>
+          </div>
+        </form>
+
+        {/* Desktop navigation */}
+        <div className="hidden md:flex items-center gap-4">
+          {isAuthenticated ? (
+            <>
+              <Link to="/wishlist">
+                <Button variant="ghost" size="icon">
+                  <Heart className="h-5 w-5" />
+                </Button>
+              </Link>
+              <Link to="/notifications">
+                <Button variant="ghost" size="icon">
+                  <Bell className="h-5 w-5" />
+                </Button>
+              </Link>
+              <Link to="/cart" className="relative">
+                <Button variant="ghost" size="icon">
+                  <ShoppingCart className="h-5 w-5" />
+                  {cartItemCount > 0 && (
+                    <Badge className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 bg-primary text-white rounded-full">
+                      {cartItemCount}
+                    </Badge>
+                  )}
+                </Button>
+              </Link>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="gap-2">
+                    <User className="h-5 w-5" />
+                    <span className="hidden sm:inline">{userName}</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem asChild>
+                    <Link to="/account/profile" className="w-full cursor-pointer">Profile</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/account/orders" className="w-full cursor-pointer">Orders</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/account/wishlist" className="w-full cursor-pointer">Wishlist</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link to="/logout" className="w-full cursor-pointer">Logout</Link>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </>
+          ) : (
+            <>
+              <Link to="/cart" className="relative">
+                <Button variant="ghost" size="icon">
+                  <ShoppingCart className="h-5 w-5" />
+                  {cartItemCount > 0 && (
+                    <Badge className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 bg-primary text-white rounded-full">
+                      {cartItemCount}
+                    </Badge>
+                  )}
+                </Button>
+              </Link>
+              <Link to="/login">
+                <Button variant="outline" size="sm">Login</Button>
+              </Link>
+              <Link to="/register">
+                <Button size="sm">Register</Button>
+              </Link>
+            </>
+          )}
+        </div>
+
+        {/* Mobile navigation icons */}
+        <div className="flex md:hidden items-center gap-2">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={() => setShowSearchBar(!showSearchBar)}
+          >
+            <Search className="h-5 w-5" />
+          </Button>
+          
+          <Link to="/cart" className="relative">
+            <Button variant="ghost" size="icon">
+              <ShoppingCart className="h-5 w-5" />
+              {cartItemCount > 0 && (
+                <Badge className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 bg-primary text-white rounded-full">
+                  {cartItemCount}
+                </Badge>
+              )}
+            </Button>
+          </Link>
+          
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            {isMobileMenuOpen ? (
+              <X className="h-5 w-5" />
+            ) : (
+              <Menu className="h-5 w-5" />
+            )}
+          </Button>
+        </div>
+      </div>
+
+      {/* Mobile search bar - shown when search icon is clicked */}
+      {showSearchBar && (
+        <div className="md:hidden px-4 pb-4">
+          <form onSubmit={handleSearchSubmit} className="flex">
+            <Input
+              type="search"
+              placeholder="Search products..."
+              className="w-full"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <Button type="submit" size="icon" className="ml-2">
+              <Search className="h-5 w-5" />
+            </Button>
+          </form>
+        </div>
+      )}
+
+      {/* Category navigation for both desktop and mobile */}
+      <nav className="bg-white border-b">
+        <div className="container mx-auto px-4">
+          <ul className="hidden md:flex items-center space-x-6 py-3 overflow-x-auto scrollbar-hide">
+            {categories.map((category) => (
+              <li key={category.id}>
+                <Link 
+                  to={`/category/${category.slug}`}
+                  className="text-sm font-medium text-gray-700 hover:text-primary whitespace-nowrap"
+                >
+                  {category.name}
+                </Link>
+              </li>
+            ))}
+            <li>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="flex items-center gap-1 text-sm font-medium text-gray-700">
+                    More Categories
+                    <ChevronDown className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  {categories.slice(8).map((category) => (
+                    <DropdownMenuItem key={category.id} asChild>
+                      <Link to={`/category/${category.slug}`} className="w-full cursor-pointer">
+                        {category.name}
+                      </Link>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </li>
+          </ul>
+        </div>
+      </nav>
+
+      {/* Mobile menu */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden bg-white border-b shadow-md">
+          <div className="container mx-auto px-4 py-4">
+            <nav className="flex flex-col space-y-2">
+              {isAuthenticated ? (
+                <>
+                  <div className="flex items-center gap-2 pb-2 mb-2 border-b">
+                    <User className="h-5 w-5" />
+                    <span className="font-medium">Hi, {userName}</span>
+                  </div>
+                  <Link 
+                    to="/account/profile" 
+                    className="py-2 text-gray-700 hover:text-primary"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    My Profile
+                  </Link>
+                  <Link 
+                    to="/account/orders" 
+                    className="py-2 text-gray-700 hover:text-primary"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    My Orders
+                  </Link>
+                  <Link 
+                    to="/account/wishlist" 
+                    className="py-2 text-gray-700 hover:text-primary"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Wishlist
+                  </Link>
+                  <Link 
+                    to="/logout" 
+                    className="py-2 text-gray-700 hover:text-primary"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Logout
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Link 
+                    to="/login" 
+                    className="py-2 text-gray-700 hover:text-primary"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Login
+                  </Link>
+                  <Link 
+                    to="/register" 
+                    className="py-2 text-gray-700 hover:text-primary"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Register
+                  </Link>
+                </>
+              )}
+              <div className="h-px w-full bg-gray-200 my-2"></div>
+              
+              <h3 className="font-medium pb-1">Categories</h3>
+              {categories.map((category) => (
+                <Link 
+                  key={category.id}
+                  to={`/category/${category.slug}`}
+                  className="py-2 text-gray-700 hover:text-primary"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  {category.name}
+                </Link>
+              ))}
+            </nav>
+          </div>
+        </div>
+      )}
+    </header>
+  );
+}
