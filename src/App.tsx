@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -28,6 +29,7 @@ import AdminCustomersPage from "./pages/admin/customers";
 import CustomerFormPage from "./pages/admin/customer-form";
 import AdminCouponsPage from "./pages/admin/coupons";
 import AdminSettingsPage from "./pages/admin/settings";
+import AdminProfilePage from "./pages/admin/profile";
 
 // Auth pages
 import LoginPage from "./pages/auth/login";
@@ -138,6 +140,7 @@ const App = () => {
               </ProtectedRoute>
             }>
               <Route index element={<AdminDashboardPage />} />
+              <Route path="profile" element={<AdminProfilePage />} />
               <Route path="products" element={<AdminProductsPage />} />
               <Route path="products/new" element={<ProductFormPage />} />
               <Route path="products/edit/:id" element={<ProductFormPage />} />

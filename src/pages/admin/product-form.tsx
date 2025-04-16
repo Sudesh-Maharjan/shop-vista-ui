@@ -49,25 +49,36 @@ const productSchema = z.object({
 
 type ProductFormValues = z.infer<typeof productSchema>;
 
+// Real product image URLs for random selection
+const productImagePlaceholders = [
+  "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=300", // Nike shoes
+  "https://images.unsplash.com/photo-1546868871-7041f2a55e12?q=80&w=300", // Watch
+  "https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=300", // Watch on wrist
+  "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=300", // Headphones
+  "https://images.unsplash.com/photo-1572635196237-14b3f281503f?q=80&w=300", // Sunglasses
+  "https://images.unsplash.com/photo-1593998066526-65fcab3021a2?q=80&w=300", // Game controller
+  "https://images.unsplash.com/photo-1585386959984-a4155224a1ad?q=80&w=300", // Perfume
+  "https://images.unsplash.com/photo-1600080972464-8e5f35f63d08?q=80&w=300", // Shoes
+];
+
 const ProductFormPage = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const isEditing = !!id;
   
   // Image handling
-  const [images, setImages] = useState<string[]>([]);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   
-  // Initialize form
+  // Initialize form with default values
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
     defaultValues: {
       name: '',
       description: '',
       price: 0,
-      discountPrice: undefined,
-      categoryId: 0,
-      brandId: 0,
+      discountPrice: null,
+      categoryId: categories[0]?.id || 1,
+      brandId: brands[0]?.id || 1,
       inStock: true,
       isFeatured: false,
       isNewArrival: false,
@@ -88,9 +99,9 @@ const ProductFormPage = () => {
           name: product.name,
           description: product.description,
           price: product.price,
-          discountPrice: product.discountPrice || undefined,
-          categoryId: product.categoryId,
-          brandId: product.brandId,
+          discountPrice: product.discountPrice || null,
+          categoryId: product.categoryId || categories[0]?.id || 1,
+          brandId: product.brandId || brands[0]?.id || 1,
           inStock: product.inStock,
           isFeatured: product.isFeatured,
           isNewArrival: product.isNewArrival,
@@ -99,7 +110,7 @@ const ProductFormPage = () => {
         });
         
         // Set images
-        setImageUrls(product.images);
+        setImageUrls(product.images || []);
       } else {
         toast.error('Product not found');
         navigate('/admin/products');
@@ -132,14 +143,12 @@ const ProductFormPage = () => {
     if (!files) return;
     
     // In a real app, you would upload these to a storage service
-    // For now, we'll just convert them to urls
+    // For now, we'll just assign random image URLs from our placeholder array
     const newImageUrls: string[] = [];
     
     for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      // Create a placeholder URL for demo (in a real app, upload to storage)
-      const randomImageUrl = `https://images.unsplash.com/photo-${Math.floor(Math.random() * 1000000)}?w=600&h=600&fit=crop`;
-      newImageUrls.push(randomImageUrl);
+      const randomIndex = Math.floor(Math.random() * productImagePlaceholders.length);
+      newImageUrls.push(productImagePlaceholders[randomIndex]);
     }
     
     setImageUrls([...imageUrls, ...newImageUrls]);
@@ -250,9 +259,9 @@ const ProductFormPage = () => {
                               step="0.01" 
                               min="0" 
                               {...field} 
-                              value={field.value || ''}
+                              value={field.value !== null ? field.value : ''}
                               onChange={(e) => {
-                                const value = e.target.value !== '' ? parseFloat(e.target.value) : undefined;
+                                const value = e.target.value !== '' ? parseFloat(e.target.value) : null;
                                 field.onChange(value);
                               }}
                               placeholder="0.00" 
@@ -375,7 +384,7 @@ const ProductFormPage = () => {
                 {imageUrls.map((url, index) => (
                   <div key={index} className="relative group">
                     <img 
-                      src={url.replace('/placeholder.svg', 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=300')} 
+                      src={url} 
                       alt={`Product image ${index + 1}`} 
                       className="w-24 h-24 object-cover rounded-md border"
                     />
