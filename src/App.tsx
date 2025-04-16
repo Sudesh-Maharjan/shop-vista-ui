@@ -22,10 +22,15 @@ import ProfilePage from "./pages/public/profile";
 // Admin pages
 import AdminDashboardPage from "./pages/admin/dashboard";
 import AdminProductsPage from "./pages/admin/products";
+import ProductFormPage from "./pages/admin/product-form";
 import AdminOrdersPage from "./pages/admin/orders";
 import AdminCustomersPage from "./pages/admin/customers";
+import CustomerFormPage from "./pages/admin/customer-form";
 import AdminCouponsPage from "./pages/admin/coupons";
 import AdminSettingsPage from "./pages/admin/settings";
+
+// Auth pages
+import LoginPage from "./pages/auth/login";
 
 // Other pages
 import NotFound from "./pages/NotFound";
@@ -39,7 +44,6 @@ const PlaceholderPage = ({ title }: { title: string }) => (
 );
 
 // Auth pages
-const LoginPage = () => <PlaceholderPage title="Login" />;
 const RegisterPage = () => <PlaceholderPage title="Register" />;
 
 // User account pages (some implemented, others as placeholders)
@@ -48,8 +52,7 @@ const OrderDetailPage = () => <PlaceholderPage title="Order Details" />;
 const AddressesPage = () => <PlaceholderPage title="My Addresses" />;
 const ChangePasswordPage = () => <PlaceholderPage title="Change Password" />;
 
-// Placeholder for admin pages that need completion
-const AdminProductFormPage = () => <PlaceholderPage title="Add/Edit Product" />;
+// Admin order detail page
 const AdminOrderDetailPage = () => <PlaceholderPage title="Order Details" />;
 
 // For tracking pages
@@ -136,11 +139,13 @@ const App = () => {
             }>
               <Route index element={<AdminDashboardPage />} />
               <Route path="products" element={<AdminProductsPage />} />
-              <Route path="products/new" element={<AdminProductFormPage />} />
-              <Route path="products/edit/:id" element={<AdminProductFormPage />} />
+              <Route path="products/new" element={<ProductFormPage />} />
+              <Route path="products/edit/:id" element={<ProductFormPage />} />
               <Route path="orders" element={<AdminOrdersPage />} />
               <Route path="orders/:id" element={<AdminOrderDetailPage />} />
               <Route path="customers" element={<AdminCustomersPage />} />
+              <Route path="customers/new" element={<CustomerFormPage />} />
+              <Route path="customers/edit/:id" element={<CustomerFormPage />} />
               <Route path="coupons" element={<AdminCouponsPage />} />
               <Route path="settings" element={<AdminSettingsPage />} />
             </Route>

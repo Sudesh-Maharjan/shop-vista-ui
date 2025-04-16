@@ -1,20 +1,10 @@
 
 import React, { useState } from 'react';
 import { 
-  Plus, Search, MoreHorizontal, Edit, Trash2, Copy, Calendar, 
-  TagIcon, Percent, DollarSign, Check, X
+  Plus, Percent, Edit, Trash2, Clock, Check, X, MoreHorizontal,
+  CalendarIcon, Calendar, AlertCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuSeparator, 
-  DropdownMenuTrigger 
-} from '@/components/ui/dropdown-menu';
 import {
   Dialog,
   DialogContent,
@@ -24,124 +14,204 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
+import { Separator } from '@/components/ui/separator';
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from '@/components/ui/select';
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuSeparator, 
+  DropdownMenuTrigger 
+} from '@/components/ui/dropdown-menu';
 import { toast } from 'sonner';
-import { coupons } from '@/lib/data';
 import { formatDate } from '@/lib/utils/formatters';
 
-interface CouponFormData {
-  code: string;
-  discount: number;
-  type: 'percentage' | 'fixed';
-  validUntil: string;
-  isActive: boolean;
-  minimumPurchase: number;
-}
+// Example coupon data
+const coupons = [
+  {
+    id: 1,
+    code: 'WELCOME10',
+    description: 'Welcome discount for new customers',
+    type: 'percentage' as const,
+    value: 10,
+    minOrderValue: 0,
+    maxUses: 1,
+    isActive: true,
+    validFrom: '2023-07-01',
+    validTo: '2025-12-31',
+    usedCount: 45,
+    forNewCustomers: true
+  },
+  {
+    id: 2,
+    code: 'SUMMER25',
+    description: 'Summer sale discount',
+    type: 'percentage' as const,
+    value: 25,
+    minOrderValue: 50,
+    maxUses: 0,
+    isActive: true,
+    validFrom: '2023-06-01',
+    validTo: '2023-09-01',
+    usedCount: 112,
+    forNewCustomers: false
+  },
+  {
+    id: 3,
+    code: 'FLAT20',
+    description: 'Flat $20 off on all orders',
+    type: 'fixed' as const,
+    value: 20,
+    minOrderValue: 100,
+    maxUses: 0,
+    isActive: true,
+    validFrom: '2023-01-01',
+    validTo: '2023-12-31',
+    usedCount: 78,
+    forNewCustomers: false
+  },
+  {
+    id: 4,
+    code: 'FREESHIP',
+    description: 'Free shipping on orders over $50',
+    type: 'fixed' as const,
+    value: 10,
+    minOrderValue: 50,
+    maxUses: 0,
+    isActive: false,
+    validFrom: '2023-10-01',
+    validTo: '2023-10-31',
+    usedCount: 23,
+    forNewCustomers: false
+  }
+];
+
+type CouponType = 'percentage' | 'fixed';
 
 const AdminCouponsPage = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [isOpenForm, setIsOpenForm] = useState(false);
-  const [statusFilter, setStatusFilter] = useState('all');
-  
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingCoupon, setEditingCoupon] = useState<number | null>(null);
-  const [formData, setFormData] = useState<CouponFormData>({
+  const [formData, setFormData] = useState({
     code: '',
-    discount: 10,
-    type: 'percentage',
-    validUntil: new Date().toISOString().split('T')[0],
+    description: '',
+    type: 'percentage' as CouponType,
+    value: 0,
+    minOrderValue: 0,
+    maxUses: 0,
     isActive: true,
-    minimumPurchase: 0
-  });
-  
-  // Filter coupons based on search and status
-  const filteredCoupons = coupons.filter(coupon => {
-    // Search filter
-    const matchesSearch = coupon.code.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    // Status filter
-    const matchesStatus = 
-      statusFilter === 'all' || 
-      (statusFilter === 'active' && coupon.isActive) ||
-      (statusFilter === 'inactive' && !coupon.isActive);
-    
-    return matchesSearch && matchesStatus;
+    validFrom: '',
+    validTo: '',
+    forNewCustomers: false
   });
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type } = e.target;
+    const { name, value, type, checked } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'number' ? Number(value) : value
+      [name]: type === 'checkbox' ? checked : value
     }));
   };
   
-  const handleSelectChange = (name: string, value: 'percentage' | 'fixed') => {
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-  
-  const handleToggleActive = (name: string, value: boolean) => {
+  const handleSelectChange = (name: string, value: CouponType) => {
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
   };
   
-  const handleSaveCoupon = () => {
-    if (editingCoupon !== null) {
-      toast.success(`Coupon "${formData.code}" updated successfully`);
-    } else {
-      toast.success(`Coupon "${formData.code}" created successfully`);
-    }
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
     
-    setIsOpenForm(false);
+    // In a real app, this would submit to an API
+    toast.success(
+      editingCoupon 
+        ? `Coupon ${formData.code} updated successfully`
+        : `Coupon ${formData.code} created successfully`
+    );
+    
+    setIsDialogOpen(false);
+    setEditingCoupon(null);
     resetForm();
   };
   
-  const handleDeleteCoupon = (couponId: number) => {
-    toast.success('Coupon deleted successfully');
-  };
-  
-  const handleEditCoupon = (couponId: number) => {
-    const coupon = coupons.find(c => c.id === couponId);
-    if (coupon) {
+  const handleEdit = (couponId: number) => {
+    const couponToEdit = coupons.find(c => c.id === couponId);
+    if (couponToEdit) {
       setFormData({
-        code: coupon.code,
-        discount: coupon.discount,
-        type: coupon.type,
-        validUntil: coupon.validUntil,
-        isActive: coupon.isActive,
-        minimumPurchase: coupon.minimumPurchase
+        code: couponToEdit.code,
+        description: couponToEdit.description,
+        type: couponToEdit.type,
+        value: couponToEdit.value,
+        minOrderValue: couponToEdit.minOrderValue,
+        maxUses: couponToEdit.maxUses,
+        isActive: couponToEdit.isActive,
+        validFrom: couponToEdit.validFrom,
+        validTo: couponToEdit.validTo,
+        forNewCustomers: couponToEdit.forNewCustomers
       });
       setEditingCoupon(couponId);
-      setIsOpenForm(true);
+      setIsDialogOpen(true);
+    }
+  };
+  
+  const handleDelete = (couponId: number, couponCode: string) => {
+    if (window.confirm(`Are you sure you want to delete coupon "${couponCode}"?`)) {
+      // In a real app, this would make an API call
+      toast.success(`Coupon "${couponCode}" deleted successfully`);
     }
   };
   
   const resetForm = () => {
     setFormData({
       code: '',
-      discount: 10,
+      description: '',
       type: 'percentage',
-      validUntil: new Date().toISOString().split('T')[0],
+      value: 0,
+      minOrderValue: 0,
+      maxUses: 0,
       isActive: true,
-      minimumPurchase: 0
+      validFrom: '',
+      validTo: '',
+      forNewCustomers: false
     });
-    setEditingCoupon(null);
   };
   
-  const handleOpenChange = (open: boolean) => {
-    setIsOpenForm(open);
-    if (!open) resetForm();
+  const openNewCouponDialog = () => {
+    resetForm();
+    setEditingCoupon(null);
+    setIsDialogOpen(true);
+  };
+  
+  const handleToggleActive = (couponId: number, newStatus: boolean) => {
+    // In a real app, this would update the API
+    toast.success(`Coupon ${newStatus ? 'activated' : 'deactivated'} successfully`);
+  };
+  
+  const couponTypeLabel = (type: string, value: number) => {
+    return type === 'percentage' ? `${value}%` : `$${value}`;
+  };
+  
+  const today = new Date().toISOString().split('T')[0];
+  
+  const isCouponActive = (coupon: typeof coupons[0]) => {
+    if (!coupon.isActive) return false;
+    
+    const now = new Date();
+    const validFrom = new Date(coupon.validFrom);
+    const validTo = new Date(coupon.validTo);
+    
+    return now >= validFrom && now <= validTo;
   };
 
   return (
@@ -149,274 +219,300 @@ const AdminCouponsPage = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <h1 className="text-2xl font-bold tracking-tight">Coupons</h1>
         
-        <Dialog open={isOpenForm} onOpenChange={handleOpenChange}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              Add Coupon
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[500px]">
-            <DialogHeader>
-              <DialogTitle>{editingCoupon !== null ? 'Edit Coupon' : 'Create New Coupon'}</DialogTitle>
-              <DialogDescription>
-                {editingCoupon !== null 
-                  ? 'Update the coupon details and save your changes.' 
-                  : 'Fill in the details to create a new coupon code.'}
-              </DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="code" className="text-right">
-                  Code
-                </Label>
-                <Input
-                  id="code"
-                  name="code"
-                  value={formData.code}
+        <Button onClick={openNewCouponDialog}>
+          <Plus className="h-4 w-4 mr-2" />
+          Add Coupon
+        </Button>
+      </div>
+      
+      {/* Coupon Cards Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {coupons.map(coupon => (
+          <Card key={coupon.id} className="relative overflow-hidden">
+            {coupon.isActive ? (
+              <div className="absolute top-0 right-0">
+                <Badge className="rounded-none rounded-bl-lg" variant={isCouponActive(coupon) ? "success" : "outline"}>
+                  {isCouponActive(coupon) ? "Active" : "Scheduled"}
+                </Badge>
+              </div>
+            ) : (
+              <div className="absolute top-0 right-0">
+                <Badge className="rounded-none rounded-bl-lg" variant="destructive">Inactive</Badge>
+              </div>
+            )}
+            <CardHeader className="pb-2">
+              <div className="flex justify-between items-start">
+                <div>
+                  <CardTitle className="flex items-center gap-2 mb-1">
+                    <span className="font-mono bg-gray-100 px-2 py-1 rounded">{coupon.code}</span>
+                    <Badge variant="outline" className="ml-2">
+                      {couponTypeLabel(coupon.type, coupon.value)}
+                    </Badge>
+                  </CardTitle>
+                  <CardDescription>{coupon.description}</CardDescription>
+                </div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon">
+                      <MoreHorizontal className="h-4 w-4" />
+                      <span className="sr-only">Actions</span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => handleEdit(coupon.id)}>
+                      <Edit className="h-4 w-4 mr-2" />
+                      Edit
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleToggleActive(coupon.id, !coupon.isActive)}>
+                      {coupon.isActive ? (
+                        <>
+                          <X className="h-4 w-4 mr-2" />
+                          Deactivate
+                        </>
+                      ) : (
+                        <>
+                          <Check className="h-4 w-4 mr-2" />
+                          Activate
+                        </>
+                      )}
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem 
+                      onClick={() => handleDelete(coupon.id, coupon.code)}
+                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                    >
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Delete
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex flex-wrap gap-y-2">
+                  <div className="w-1/2 flex items-center gap-2 text-sm">
+                    <Calendar className="h-4 w-4 text-gray-400" />
+                    <span>From: {formatDate(coupon.validFrom)}</span>
+                  </div>
+                  <div className="w-1/2 flex items-center gap-2 text-sm">
+                    <Calendar className="h-4 w-4 text-gray-400" />
+                    <span>To: {formatDate(coupon.validTo)}</span>
+                  </div>
+                </div>
+                
+                {coupon.minOrderValue > 0 && (
+                  <div className="flex items-center gap-2 text-sm">
+                    <AlertCircle className="h-4 w-4 text-gray-400" />
+                    <span>Min. Order: ${coupon.minOrderValue}</span>
+                  </div>
+                )}
+                
+                <div className="flex items-center gap-2 text-sm">
+                  <Clock className="h-4 w-4 text-gray-400" />
+                  <span>
+                    {coupon.maxUses === 0 
+                      ? "Unlimited uses" 
+                      : `${coupon.maxUses} max uses per customer`}
+                  </span>
+                </div>
+                
+                {coupon.forNewCustomers && (
+                  <Badge variant="outline" className="bg-amber-50">
+                    New customers only
+                  </Badge>
+                )}
+                
+                <div className="mt-2 pt-2 border-t text-sm text-gray-500">
+                  Used {coupon.usedCount} times
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+      
+      {/* Add/Edit Coupon Dialog */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>{editingCoupon ? 'Edit Coupon' : 'Create New Coupon'}</DialogTitle>
+            <DialogDescription>
+              {editingCoupon 
+                ? 'Update the details for this coupon.' 
+                : 'Fill in the details to create a new discount coupon.'}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <form onSubmit={handleSubmit}>
+            <div className="grid gap-6 py-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="code">Coupon Code</Label>
+                  <Input 
+                    id="code"
+                    name="code"
+                    value={formData.code}
+                    onChange={handleInputChange}
+                    placeholder="e.g., SUMMER25"
+                    className="uppercase"
+                    required
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="type">Discount Type</Label>
+                  <Select 
+                    value={formData.type} 
+                    onValueChange={(value) => handleSelectChange('type', value as CouponType)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select discount type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="percentage">Percentage (%)</SelectItem>
+                      <SelectItem value="fixed">Fixed Amount ($)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="description">Description</Label>
+                <Input 
+                  id="description"
+                  name="description"
+                  value={formData.description}
                   onChange={handleInputChange}
-                  placeholder="SUMMER2023"
-                  className="col-span-3"
+                  placeholder="Brief description of this coupon"
+                  required
                 />
               </div>
               
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="type" className="text-right">
-                  Type
-                </Label>
-                <Select
-                  value={formData.type}
-                  onValueChange={(value) => handleSelectChange('type', value)}
-                >
-                  <SelectTrigger className="col-span-3">
-                    <SelectValue placeholder="Select type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="percentage">Percentage</SelectItem>
-                    <SelectItem value="fixed">Fixed Amount</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="discount" className="text-right">
-                  {formData.type === 'percentage' ? 'Percentage' : 'Amount'}
-                </Label>
-                <div className="col-span-3 flex items-center">
-                  <Input
-                    id="discount"
-                    name="discount"
-                    type="number"
-                    value={formData.discount}
-                    onChange={handleInputChange}
-                    min={0}
-                    max={formData.type === 'percentage' ? 100 : undefined}
-                    className="flex-grow"
-                  />
-                  <div className="ml-2">
-                    {formData.type === 'percentage' ? '%' : '$'}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="value">Discount Value</Label>
+                  <div className="relative">
+                    <Input 
+                      id="value"
+                      name="value"
+                      type="number"
+                      min="0"
+                      value={formData.value}
+                      onChange={handleInputChange}
+                      className={formData.type === 'percentage' ? 'pr-8' : 'pl-8'}
+                      required
+                    />
+                    <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                      {formData.type === 'percentage' ? '%' : ''}
+                    </div>
+                    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                      {formData.type === 'fixed' ? '$' : ''}
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="minOrderValue">Minimum Order Value</Label>
+                  <div className="relative">
+                    <Input 
+                      id="minOrderValue"
+                      name="minOrderValue"
+                      type="number"
+                      min="0"
+                      value={formData.minOrderValue}
+                      onChange={handleInputChange}
+                      className="pl-8"
+                    />
+                    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                      $
+                    </div>
                   </div>
                 </div>
               </div>
               
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="validUntil" className="text-right">
-                  Valid Until
-                </Label>
-                <Input
-                  id="validUntil"
-                  name="validUntil"
-                  type="date"
-                  value={formData.validUntil}
-                  onChange={handleInputChange}
-                  className="col-span-3"
-                />
-              </div>
-              
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="minimumPurchase" className="text-right">
-                  Min. Purchase
-                </Label>
-                <div className="col-span-3 flex items-center">
-                  <span className="mr-2">$</span>
-                  <Input
-                    id="minimumPurchase"
-                    name="minimumPurchase"
-                    type="number"
-                    value={formData.minimumPurchase}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="validFrom">Valid From</Label>
+                  <Input 
+                    id="validFrom"
+                    name="validFrom"
+                    type="date"
+                    value={formData.validFrom}
                     onChange={handleInputChange}
-                    min={0}
+                    min={today}
+                    required
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="validTo">Valid To</Label>
+                  <Input 
+                    id="validTo"
+                    name="validTo"
+                    type="date"
+                    value={formData.validTo}
+                    onChange={handleInputChange}
+                    min={formData.validFrom || today}
+                    required
                   />
                 </div>
               </div>
               
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label className="text-right">Active</Label>
-                <div className="flex items-center col-span-3">
-                  <Button
-                    type="button"
-                    variant={formData.isActive ? "default" : "outline"}
-                    size="sm"
-                    className="mr-2"
-                    onClick={() => handleToggleActive('isActive', true)}
-                  >
-                    <Check className="h-4 w-4 mr-1" />
-                    Yes
-                  </Button>
-                  <Button
-                    type="button"
-                    variant={!formData.isActive ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => handleToggleActive('isActive', false)}
-                  >
-                    <X className="h-4 w-4 mr-1" />
-                    No
-                  </Button>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="maxUses">Max Uses Per Customer</Label>
+                  <Input 
+                    id="maxUses"
+                    name="maxUses"
+                    type="number"
+                    min="0"
+                    value={formData.maxUses}
+                    onChange={handleInputChange}
+                    placeholder="0 for unlimited"
+                  />
+                  <p className="text-xs text-gray-500">Set to 0 for unlimited uses</p>
+                </div>
+                
+                <div className="space-y-4 pt-2">
+                  <div className="flex items-center justify-between space-x-2">
+                    <Label htmlFor="isActive">Active</Label>
+                    <Switch 
+                      id="isActive"
+                      name="isActive"
+                      checked={formData.isActive}
+                      onCheckedChange={(checked) => 
+                        setFormData(prev => ({ ...prev, isActive: checked }))
+                      }
+                    />
+                  </div>
+                  
+                  <div className="flex items-center justify-between space-x-2">
+                    <Label htmlFor="forNewCustomers">New Customers Only</Label>
+                    <Switch 
+                      id="forNewCustomers"
+                      name="forNewCustomers"
+                      checked={formData.forNewCustomers}
+                      onCheckedChange={(checked) => 
+                        setFormData(prev => ({ ...prev, forNewCustomers: checked }))
+                      }
+                    />
+                  </div>
                 </div>
               </div>
             </div>
+            
+            <Separator className="my-4" />
+            
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setIsOpenForm(false)}>
-                Cancel
-              </Button>
-              <Button type="button" onClick={handleSaveCoupon}>
-                {editingCoupon !== null ? 'Update Coupon' : 'Create Coupon'}
+              <Button variant="outline" type="button" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
+              <Button type="submit">
+                {editingCoupon ? 'Update Coupon' : 'Create Coupon'}
               </Button>
             </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      </div>
-      
-      {/* Filters */}
-      <Card>
-        <CardContent className="p-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Search */}
-            <div className="relative">
-              <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input 
-                placeholder="Search coupons..." 
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-8"
-              />
-            </div>
-            
-            {/* Status Filter */}
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger>
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="inactive">Inactive</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </CardContent>
-      </Card>
-      
-      {/* Coupons Table */}
-      <div className="bg-white rounded-md shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="bg-gray-50">
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Code</th>
-                <th className="px-4 py-3 text-center text-sm font-medium text-gray-500">Discount</th>
-                <th className="px-4 py-3 text-center text-sm font-medium text-gray-500">Min. Purchase</th>
-                <th className="px-4 py-3 text-center text-sm font-medium text-gray-500">Valid Until</th>
-                <th className="px-4 py-3 text-center text-sm font-medium text-gray-500">Status</th>
-                <th className="px-4 py-3"></th>
-              </tr>
-            </thead>
-            <tbody className="divide-y">
-              {filteredCoupons.map(coupon => (
-                <tr key={coupon.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-2">
-                      <TagIcon className="h-5 w-5 text-primary-600" />
-                      <div className="font-medium text-gray-900">{coupon.code}</div>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <div className="inline-flex items-center">
-                      {coupon.type === 'percentage' ? (
-                        <>
-                          <Percent className="h-4 w-4 mr-1 text-amber-500" />
-                          <span>{coupon.discount}% off</span>
-                        </>
-                      ) : (
-                        <>
-                          <DollarSign className="h-4 w-4 mr-1 text-green-500" />
-                          <span>${coupon.discount} off</span>
-                        </>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    {coupon.minimumPurchase > 0 ? (
-                      <span className="text-sm">${coupon.minimumPurchase}</span>
-                    ) : (
-                      <span className="text-sm text-gray-500">None</span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <div className="flex justify-center items-center">
-                      <Calendar className="h-4 w-4 mr-1 text-gray-400" />
-                      <span className="text-sm">{formatDate(coupon.validUntil)}</span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    {coupon.isActive ? (
-                      <Badge className="bg-green-100 text-green-800 hover:bg-green-100">Active</Badge>
-                    ) : (
-                      <Badge variant="outline" className="text-gray-500">Inactive</Badge>
-                    )}
-                  </td>
-                  <td className="px-4 py-3">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                          <MoreHorizontal className="h-4 w-4" />
-                          <span className="sr-only">Actions</span>
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleEditCoupon(coupon.id)}>
-                          <Edit className="h-4 w-4 mr-2" />
-                          Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleDeleteCoupon(coupon.id)}>
-                          <Trash2 className="h-4 w-4 mr-2" />
-                          Delete
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => {
-                          navigator.clipboard.writeText(coupon.code);
-                          toast.success('Coupon code copied to clipboard');
-                        }}>
-                          <Copy className="h-4 w-4 mr-2" />
-                          Copy Code
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </td>
-                </tr>
-              ))}
-              
-              {filteredCoupons.length === 0 && (
-                <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
-                    No coupons found. Try adjusting your filters or create a new coupon.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

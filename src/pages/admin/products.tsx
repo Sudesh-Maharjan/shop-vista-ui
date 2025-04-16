@@ -36,12 +36,31 @@ import { toast } from 'sonner';
 import { products, categories, brands } from '@/lib/data';
 import { formatPrice } from '@/lib/utils/formatters';
 
+// Real product image URLs
+const productImages = [
+  "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=300", // Nike shoes
+  "https://images.unsplash.com/photo-1546868871-7041f2a55e12?q=80&w=300", // Watch
+  "https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=300", // Watch on wrist
+  "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=300", // Headphones
+  "https://images.unsplash.com/photo-1572635196237-14b3f281503f?q=80&w=300", // Sunglasses
+  "https://images.unsplash.com/photo-1593998066526-65fcab3021a2?q=80&w=300", // Game controller
+  "https://images.unsplash.com/photo-1585386959984-a4155224a1ad?q=80&w=300", // Perfume
+  "https://images.unsplash.com/photo-1600080972464-8e5f35f63d08?q=80&w=300", // Shoes
+  "https://images.unsplash.com/photo-1625772452859-1c03d5bf1137?q=80&w=300", // Backpack
+  "https://images.unsplash.com/photo-1517142089942-ba376ce32a2e?q=80&w=300", // T-shirt
+];
+
 const AdminProductsPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [stockFilter, setStockFilter] = useState('all');
   const [sortOrder, setSortOrder] = useState('newest');
   const [selectedProducts, setSelectedProducts] = useState<number[]>([]);
+  
+  // Helper function to get a consistent image URL for a product based on ID
+  const getProductImage = (productId: number) => {
+    return productImages[productId % productImages.length];
+  };
   
   // Filter products based on search term, category, and stock
   const filteredProducts = products.filter(product => {
@@ -97,8 +116,24 @@ const AdminProductsPage = () => {
   const handleBulkDelete = () => {
     if (selectedProducts.length === 0) return;
     
-    toast.success(`${selectedProducts.length} products deleted successfully`);
-    setSelectedProducts([]);
+    if (window.confirm(`Are you sure you want to delete ${selectedProducts.length} products?`)) {
+      toast.success(`${selectedProducts.length} products deleted successfully`);
+      setSelectedProducts([]);
+    }
+  };
+  
+  const handleDeleteProduct = (productId: number, productName: string) => {
+    if (window.confirm(`Are you sure you want to delete "${productName}"?`)) {
+      toast.success(`Product "${productName}" deleted successfully`);
+      // In a real app, this would make an API call to delete the product
+      // Then update the local state
+      setSelectedProducts(prev => prev.filter(id => id !== productId));
+    }
+  };
+  
+  const handleDuplicateProduct = (productId: number, productName: string) => {
+    toast.success(`Product "${productName}" duplicated successfully`);
+    // In a real app, this would create a new product with similar data
   };
 
   return (
@@ -232,7 +267,7 @@ const AdminProductsPage = () => {
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-gray-100 rounded overflow-hidden">
                           <img 
-                            src={product.images[0].replace('/placeholder.svg', 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=300')} 
+                            src={getProductImage(product.id)} 
                             alt={product.name}
                             className="w-full h-full object-cover"
                           />
@@ -297,13 +332,13 @@ const AdminProductsPage = () => {
                               View
                             </Link>
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => toast.success('Product duplicated')}>
+                          <DropdownMenuItem onClick={() => handleDuplicateProduct(product.id, product.name)}>
                             <Copy className="h-4 w-4 mr-2" />
                             Duplicate
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem 
-                            onClick={() => toast.success('Product deleted')}
+                            onClick={() => handleDeleteProduct(product.id, product.name)}
                             className="text-red-600 hover:text-red-700 hover:bg-red-50"
                           >
                             <Trash2 className="h-4 w-4 mr-2" />

@@ -8,6 +8,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -34,6 +35,7 @@ import {
 import { toast } from 'sonner';
 import { orders } from '@/lib/data';
 import { formatPrice, formatDate } from '@/lib/utils/formatters';
+import ExportOrdersDialog from '@/components/admin/export-orders-dialog';
 
 // A more comprehensive set of orders
 const extendedOrders = [
@@ -81,6 +83,7 @@ const AdminOrdersPage = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [dateFilter, setDateFilter] = useState('all');
   const [sortOrder, setSortOrder] = useState('newest');
+  const [selectedOrders, setSelectedOrders] = useState<string[]>([]);
   
   // Filter orders based on search term, status, and date
   const filteredOrders = extendedOrders.filter(order => {
@@ -160,6 +163,47 @@ const AdminOrdersPage = () => {
   const handleUpdateStatus = (orderId: string, newStatus: string) => {
     toast.success(`Order ${orderId} updated to ${newStatus}`);
   };
+  
+  const handleExportOrders = (format: 'csv' | 'json' | 'excel', selection: 'all' | 'filtered' | 'selected') => {
+    let exportCount = 0;
+    let message = '';
+    
+    switch (selection) {
+      case 'all':
+        exportCount = extendedOrders.length;
+        message = `Exporting all ${exportCount} orders as ${format.toUpperCase()}`;
+        break;
+      case 'filtered':
+        exportCount = filteredOrders.length;
+        message = `Exporting ${exportCount} filtered orders as ${format.toUpperCase()}`;
+        break;
+      case 'selected':
+        exportCount = selectedOrders.length;
+        message = `Exporting ${exportCount} selected orders as ${format.toUpperCase()}`;
+        break;
+    }
+    
+    toast.success(message);
+    
+    // In a real app, this would trigger the actual export process
+    // For demo purposes, we just show a success message
+  };
+  
+  const toggleSelectOrder = (orderId: string) => {
+    setSelectedOrders(prev => 
+      prev.includes(orderId) 
+        ? prev.filter(id => id !== orderId)
+        : [...prev, orderId]
+    );
+  };
+  
+  const toggleSelectAll = () => {
+    if (selectedOrders.length === sortedOrders.length) {
+      setSelectedOrders([]);
+    } else {
+      setSelectedOrders(sortedOrders.map(order => order.id));
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -167,13 +211,17 @@ const AdminOrdersPage = () => {
         <h1 className="text-2xl font-bold tracking-tight">Orders</h1>
         
         <div className="flex flex-wrap gap-2">
-          <Button 
-            variant="outline" 
-            onClick={() => toast.success('Orders exported successfully')}
-          >
-            <Download className="h-4 w-4 mr-2" />
-            Export
-          </Button>
+          <ExportOrdersDialog 
+            trigger={
+              <Button variant="outline">
+                <Download className="h-4 w-4 mr-2" />
+                Export
+              </Button>
+            }
+            onExport={handleExportOrders}
+            hasFilters={statusFilter !== 'all' || dateFilter !== 'all' || searchTerm !== ''}
+            hasSelection={selectedOrders.length > 0}
+          />
         </div>
       </div>
       
@@ -241,6 +289,12 @@ const AdminOrdersPage = () => {
           <table className="w-full">
             <thead>
               <tr className="bg-gray-50">
+                <th className="w-12 px-4 py-3 text-left">
+                  <Checkbox 
+                    checked={selectedOrders.length === sortedOrders.length && sortedOrders.length > 0}
+                    onCheckedChange={toggleSelectAll}
+                  />
+                </th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">
                   <div className="flex items-center gap-1">
                     Order ID
@@ -268,6 +322,12 @@ const AdminOrdersPage = () => {
             <tbody className="divide-y">
               {sortedOrders.map(order => (
                 <tr key={order.id} className="hover:bg-gray-50">
+                  <td className="px-4 py-3">
+                    <Checkbox 
+                      checked={selectedOrders.includes(order.id)}
+                      onCheckedChange={() => toggleSelectOrder(order.id)}
+                    />
+                  </td>
                   <td className="px-4 py-3">
                     <div className="font-medium text-gray-900">{order.id}</div>
                     <div className="text-xs text-gray-500">{order.items.length} items</div>
@@ -334,7 +394,7 @@ const AdminOrdersPage = () => {
               
               {sortedOrders.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
+                  <td colSpan={8} className="px-4 py-8 text-center text-gray-500">
                     No orders found. Try adjusting your filters.
                   </td>
                 </tr>
