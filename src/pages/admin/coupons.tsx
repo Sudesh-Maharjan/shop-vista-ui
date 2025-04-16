@@ -82,7 +82,7 @@ const AdminCouponsPage = () => {
     }));
   };
   
-  const handleSelectChange = (name: string, value: string) => {
+  const handleSelectChange = (name: string, value: 'percentage' | 'fixed') => {
     setFormData(prev => ({
       ...prev,
       [name]: value

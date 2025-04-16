@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { formatPrice, formatDate } from '@/lib/utils/formatters';
-import { orders, products, shippingMethods } from '@/lib/data';
+import { orders, products, shippingMethods, currentUser } from '@/lib/data';
 
 const OrderConfirmationPage = () => {
   const { id } = useParams<{ id: string }>();
