@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRight, ArrowRight } from 'lucide-react';
@@ -9,45 +8,42 @@ import { Separator } from '@/components/ui/separator';
 import { ProductCard } from '@/components/ui/product-card';
 import { products, categories } from '@/lib/data';
 
-export default function HomePage() {
+const HomePage = () => {
   const [activeTab, setActiveTab] = useState<'featured' | 'bestsellers' | 'new'>('featured');
   
   const featuredProducts = products.filter(product => product.isFeatured);
   const bestSellers = products.filter(product => product.isBestSeller);
   const newArrivals = products.filter(product => product.isNewArrival);
   
-  // Display products based on active tab
   const productsToDisplay = 
     activeTab === 'featured' ? featuredProducts :
     activeTab === 'bestsellers' ? bestSellers : 
     newArrivals;
 
   return (
-    <div className="flex flex-col">
+    <div className="space-y-12 pb-8">
       {/* Hero Banner */}
-      <section className="relative bg-gradient-to-r from-primary-600 to-primary-800 text-white">
-        <div className="container mx-auto px-4 py-16 md:py-24 flex flex-col md:flex-row items-center">
-          <div className="md:w-1/2 mb-10 md:mb-0 md:pr-8">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">Spring Collection 2023</h1>
-            <p className="text-lg mb-6">Discover the latest trends and styles that will define this season.</p>
-            <div className="flex flex-wrap gap-3">
-              <Button asChild size="lg" className="bg-white text-primary-700 hover:bg-gray-100">
-                <Link to="/products">Shop Now</Link>
-              </Button>
-              <Button asChild variant="outline" size="lg" className="border-white text-white hover:bg-white/10">
-                <Link to="/category/clothing">View Collection</Link>
-              </Button>
-            </div>
-          </div>
-          <div className="md:w-1/2 relative">
-            <img 
-              src="/placeholder.svg" 
-              alt="Spring Collection" 
-              className="rounded-lg shadow-lg mx-auto w-full max-w-md"
-            />
-            <div className="absolute -bottom-4 -right-4 bg-accent text-white py-2 px-4 rounded-lg shadow-md">
-              <p className="text-sm font-medium">Up to</p>
-              <p className="text-2xl font-bold">40% OFF</p>
+      <section className="relative">
+        <div className="w-full h-[500px] relative overflow-hidden rounded-lg">
+          <img 
+            src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?q=80&w=2070&h=700&auto=format&fit=crop"
+            alt="Shop the latest collection" 
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent flex items-center">
+            <div className="container mx-auto px-6">
+              <div className="max-w-lg text-white">
+                <h1 className="text-4xl md:text-5xl font-bold mb-4">Summer Collection 2025</h1>
+                <p className="text-lg mb-6">Discover the latest trends and styles for the upcoming season.</p>
+                <div className="flex flex-wrap gap-3">
+                  <Button size="lg" asChild>
+                    <Link to="/products">Shop Now</Link>
+                  </Button>
+                  <Button size="lg" variant="outline" className="bg-white/10 backdrop-blur-sm border-white" asChild>
+                    <Link to="/category/new-arrivals">New Arrivals</Link>
+                  </Button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -224,4 +220,6 @@ export default function HomePage() {
       </section>
     </div>
   );
-}
+};
+
+export default HomePage;

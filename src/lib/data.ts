@@ -1,4 +1,3 @@
-
 // Mock data for our eCommerce application
 
 // Product Categories
@@ -621,5 +620,54 @@ export const paymentMethods = [
     id: 4,
     name: "Google Pay",
     icon: "google"
+  }
+];
+
+// Customers data
+export const customers = [
+  {
+    id: 1,
+    name: "Jane Cooper",
+    email: "jane.cooper@example.com",
+    role: "customer",
+    joinDate: "Jan 15, 2023",
+    orders: 5,
+    totalSpent: 430.50
+  },
+  {
+    id: 2,
+    name: "Wade Warren",
+    email: "wade.warren@example.com",
+    role: "wholesale",
+    joinDate: "Feb 3, 2023",
+    orders: 12,
+    totalSpent: 1850.75
+  },
+  {
+    id: 3,
+    name: "Esther Howard",
+    email: "esther.howard@example.com",
+    role: "vip",
+    joinDate: "Mar 20, 2023",
+    orders: 8,
+    totalSpent: 975.25
+  },
+  {
+    id: 4,
+    name: "Cameron Williamson",
+    email: "cameron.williamson@example.com",
+    role: "customer",
+    joinDate: "Apr 8, 2023",
+    orders: 3,
+    totalSpent: 185.00
+  },
+  {
+    id: 5,
+    name: "Brooklyn Simmons",
+    email: "brooklyn.simmons@example.com",
+    role: "customer",
+    joinDate: "May 12, 2023",
+    orders: 7,
+    totalSpent: 645.90
   }
 ];
