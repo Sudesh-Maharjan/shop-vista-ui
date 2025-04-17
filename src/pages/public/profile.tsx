@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { User, ShoppingBag, Heart, MapPin, Lock, LogOut, Check, Pencil } from 'lucide-react';
@@ -79,72 +78,69 @@ const ProfilePage = () => {
               <Separator className="mb-4" />
               
               <nav className="space-y-1">
-                <TabsList className="flex flex-col h-auto bg-transparent p-0 w-full">
-                  <TabsTrigger
-                    value="profile"
-                    onClick={() => handleTabChange('profile')}
-                    className={`justify-start w-full px-3 py-2 text-left ${
-                      activeTab === 'profile' 
-                        ? 'bg-primary/10 text-primary' 
-                        : 'hover:bg-gray-100'
-                    }`}
-                  >
-                    <User className="h-4 w-4 mr-2" />
-                    <span>Profile Information</span>
-                  </TabsTrigger>
-                  
-                  <TabsTrigger
-                    value="orders"
-                    onClick={() => handleTabChange('orders')}
-                    className={`justify-start w-full px-3 py-2 text-left ${
-                      activeTab === 'orders' 
-                        ? 'bg-primary/10 text-primary' 
-                        : 'hover:bg-gray-100'
-                    }`}
-                  >
-                    <ShoppingBag className="h-4 w-4 mr-2" />
-                    <span>Orders</span>
-                  </TabsTrigger>
-                  
-                  <TabsTrigger
-                    value="addresses"
-                    onClick={() => handleTabChange('addresses')}
-                    className={`justify-start w-full px-3 py-2 text-left ${
-                      activeTab === 'addresses' 
-                        ? 'bg-primary/10 text-primary' 
-                        : 'hover:bg-gray-100'
-                    }`}
-                  >
-                    <MapPin className="h-4 w-4 mr-2" />
-                    <span>Addresses</span>
-                  </TabsTrigger>
-                  
-                  <TabsTrigger
-                    value="wishlist"
-                    onClick={() => handleTabChange('wishlist')}
-                    className={`justify-start w-full px-3 py-2 text-left ${
-                      activeTab === 'wishlist' 
-                        ? 'bg-primary/10 text-primary' 
-                        : 'hover:bg-gray-100'
-                    }`}
-                  >
-                    <Heart className="h-4 w-4 mr-2" />
-                    <span>Wishlist</span>
-                  </TabsTrigger>
-                  
-                  <TabsTrigger
-                    value="password"
-                    onClick={() => handleTabChange('password')}
-                    className={`justify-start w-full px-3 py-2 text-left ${
-                      activeTab === 'password' 
-                        ? 'bg-primary/10 text-primary' 
-                        : 'hover:bg-gray-100'
-                    }`}
-                  >
-                    <Lock className="h-4 w-4 mr-2" />
-                    <span>Change Password</span>
-                  </TabsTrigger>
-                </TabsList>
+                <Tabs value={activeTab} onValueChange={handleTabChange} orientation="vertical" className="w-full">
+                  <TabsList className="flex flex-col h-auto bg-transparent p-0 w-full">
+                    <TabsTrigger
+                      value="profile"
+                      className={`justify-start w-full px-3 py-2 text-left ${
+                        activeTab === 'profile' 
+                          ? 'bg-primary/10 text-primary' 
+                          : 'hover:bg-gray-100'
+                      }`}
+                    >
+                      <User className="h-4 w-4 mr-2" />
+                      <span>Profile Information</span>
+                    </TabsTrigger>
+                    
+                    <TabsTrigger
+                      value="orders"
+                      className={`justify-start w-full px-3 py-2 text-left ${
+                        activeTab === 'orders' 
+                          ? 'bg-primary/10 text-primary' 
+                          : 'hover:bg-gray-100'
+                      }`}
+                    >
+                      <ShoppingBag className="h-4 w-4 mr-2" />
+                      <span>Orders</span>
+                    </TabsTrigger>
+                    
+                    <TabsTrigger
+                      value="addresses"
+                      className={`justify-start w-full px-3 py-2 text-left ${
+                        activeTab === 'addresses' 
+                          ? 'bg-primary/10 text-primary' 
+                          : 'hover:bg-gray-100'
+                      }`}
+                    >
+                      <MapPin className="h-4 w-4 mr-2" />
+                      <span>Addresses</span>
+                    </TabsTrigger>
+                    
+                    <TabsTrigger
+                      value="wishlist"
+                      className={`justify-start w-full px-3 py-2 text-left ${
+                        activeTab === 'wishlist' 
+                          ? 'bg-primary/10 text-primary' 
+                          : 'hover:bg-gray-100'
+                      }`}
+                    >
+                      <Heart className="h-4 w-4 mr-2" />
+                      <span>Wishlist</span>
+                    </TabsTrigger>
+                    
+                    <TabsTrigger
+                      value="password"
+                      className={`justify-start w-full px-3 py-2 text-left ${
+                        activeTab === 'password' 
+                          ? 'bg-primary/10 text-primary' 
+                          : 'hover:bg-gray-100'
+                      }`}
+                    >
+                      <Lock className="h-4 w-4 mr-2" />
+                      <span>Change Password</span>
+                    </TabsTrigger>
+                  </TabsList>
+                </Tabs>
               </nav>
               
               <Separator className="my-4" />
@@ -163,7 +159,7 @@ const ProfilePage = () => {
         
         {/* Main Content */}
         <div className="lg:col-span-3">
-          <Tabs value={activeTab} className="w-full">
+          <Tabs value={activeTab} onValueChange={handleTabChange}>
             {/* Profile Information */}
             <TabsContent value="profile">
               <Card>

@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
@@ -16,15 +15,8 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { categories } from '@/lib/data';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { toast } from 'sonner';
 
-interface NavbarProps {
-  isAuthenticated?: boolean;
-  userName?: string;
-  cartItemCount?: number;
-  onSearchSubmit?: (query: string) => void;
-}
-
-// Sample notifications for the dropdown
 const sampleNotifications = [
   { id: 1, title: 'Order Shipped', text: 'Your order #12345 has been shipped', time: '5 mins ago', read: false },
   { id: 2, title: 'Price Drop', text: 'A product in your wishlist is now on sale', time: '2 hours ago', read: false },
@@ -55,19 +47,15 @@ export function Navbar({
     toast.success('Item added to cart');
   };
 
-  // Add this to the global scope of your component
   window.addToCart = handleAddToCart;
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white border-b shadow-sm">
-      {/* Top bar with logo and search on desktop */}
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-        {/* Logo */}
         <Link to="/" className="flex items-center gap-2">
           <span className="text-2xl font-bold text-primary">ShopVista</span>
         </Link>
 
-        {/* Search bar - Desktop only */}
         <form 
           onSubmit={handleSearchSubmit} 
           className="hidden md:flex flex-1 max-w-md mx-4"
@@ -91,7 +79,6 @@ export function Navbar({
           </div>
         </form>
 
-        {/* Desktop navigation */}
         <div className="hidden md:flex items-center gap-4">
           {isAuthenticated ? (
             <>
@@ -101,7 +88,6 @@ export function Navbar({
                 </Button>
               </Link>
               
-              {/* Notifications Popover */}
               <Popover>
                 <PopoverTrigger asChild>
                   <Button variant="ghost" size="icon" className="relative">
@@ -201,7 +187,6 @@ export function Navbar({
           )}
         </div>
 
-        {/* Mobile navigation icons */}
         <div className="flex md:hidden items-center gap-2">
           <Button 
             variant="ghost" 
@@ -236,7 +221,6 @@ export function Navbar({
         </div>
       </div>
 
-      {/* Mobile search bar - shown when search icon is clicked */}
       {showSearchBar && (
         <div className="md:hidden px-4 pb-4">
           <form onSubmit={handleSearchSubmit} className="flex">
@@ -254,7 +238,6 @@ export function Navbar({
         </div>
       )}
 
-      {/* Category navigation for both desktop and mobile */}
       <nav className="bg-white border-b">
         <div className="container mx-auto px-4">
           <ul className="hidden md:flex items-center space-x-6 py-3 overflow-x-auto scrollbar-hide">
@@ -291,7 +274,6 @@ export function Navbar({
         </div>
       </nav>
 
-      {/* Mobile menu */}
       {isMobileMenuOpen && (
         <div className="md:hidden bg-white border-b shadow-md">
           <div className="container mx-auto px-4 py-4">
