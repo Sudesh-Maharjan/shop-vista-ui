@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Navbar } from './navbar';
 import { Footer } from './footer';
@@ -12,6 +12,12 @@ import { toast } from 'sonner';
 interface MainLayoutProps {
   isAuthenticated?: boolean;
   userName?: string;
+}
+
+declare global {
+  interface Window {
+    addToCart: (productId?: number) => void;
+  }
 }
 
 export function MainLayout({ isAuthenticated = false, userName = 'Guest' }: MainLayoutProps) {
@@ -27,13 +33,20 @@ export function MainLayout({ isAuthenticated = false, userName = 'Guest' }: Main
   };
 
   // Add to cart function that updates the state
-  const handleAddToCart = () => {
+  const handleAddToCart = (productId?: number) => {
     setCartItemCount(prev => prev + 1);
     toast.success('Item added to cart');
   };
 
   // Set global addToCart function
-  window.addToCart = handleAddToCart;
+  useEffect(() => {
+    window.addToCart = handleAddToCart;
+    
+    // Cleanup on unmount
+    return () => {
+      delete window.addToCart;
+    };
+  }, []);
 
   return (
     <div className="flex flex-col min-h-screen">

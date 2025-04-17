@@ -310,55 +310,57 @@ const CustomerFormPage = () => {
             <CardContent className="p-6">
               <h3 className="text-lg font-medium mb-4">Customer Status</h3>
               
-              <div className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="isActive"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                      <FormControl>
-                        <Checkbox
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                      <div className="space-y-1 leading-none">
-                        <FormLabel>Active Account</FormLabel>
-                        <FormDescription>
-                          Customer can login and place orders if checked
-                        </FormDescription>
+              <Form {...form}>
+                <div className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="isActive"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                          <FormLabel>Active Account</FormLabel>
+                          <FormDescription>
+                            Customer can login and place orders if checked
+                          </FormDescription>
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+                  
+                  {isEditing && (
+                    <>
+                      <Separator className="my-4" />
+                      
+                      <div className="space-y-2">
+                        <h4 className="text-sm font-medium">Orders</h4>
+                        <div className="text-2xl font-bold">
+                          {customers.find(c => c.id === parseInt(id as string))?.orders || 0}
+                        </div>
                       </div>
-                    </FormItem>
+                      
+                      <div className="space-y-2">
+                        <h4 className="text-sm font-medium">Total Spent</h4>
+                        <div className="text-2xl font-bold">
+                          ${customers.find(c => c.id === parseInt(id as string))?.totalSpent.toFixed(2) || '0.00'}
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <h4 className="text-sm font-medium">Customer Since</h4>
+                        <div className="text-sm">
+                          {customers.find(c => c.id === parseInt(id as string))?.joinDate || 'N/A'}
+                        </div>
+                      </div>
+                    </>
                   )}
-                />
-                
-                {isEditing && (
-                  <>
-                    <Separator className="my-4" />
-                    
-                    <div className="space-y-2">
-                      <h4 className="text-sm font-medium">Orders</h4>
-                      <div className="text-2xl font-bold">
-                        {customers.find(c => c.id === parseInt(id as string))?.orders || 0}
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <h4 className="text-sm font-medium">Total Spent</h4>
-                      <div className="text-2xl font-bold">
-                        ${customers.find(c => c.id === parseInt(id as string))?.totalSpent.toFixed(2) || '0.00'}
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <h4 className="text-sm font-medium">Customer Since</h4>
-                      <div className="text-sm">
-                        {customers.find(c => c.id === parseInt(id as string))?.joinDate || 'N/A'}
-                      </div>
-                    </div>
-                  </>
-                )}
-              </div>
+                </div>
+              </Form>
             </CardContent>
           </Card>
         </div>
