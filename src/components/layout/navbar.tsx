@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
@@ -54,7 +55,8 @@ export function Navbar({
     toast.success('Item added to cart');
   };
 
-  window.addToCart = handleAddToCart;
+  // This should not override the global addToCart function
+  // window.addToCart = handleAddToCart;
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white border-b shadow-sm">
@@ -95,48 +97,16 @@ export function Navbar({
                 </Button>
               </Link>
               
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="ghost" size="icon" className="relative">
-                    <Bell className="h-5 w-5" />
-                    {sampleNotifications.filter(n => !n.read).length > 0 && (
-                      <Badge className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 bg-destructive text-white rounded-full">
-                        {sampleNotifications.filter(n => !n.read).length}
-                      </Badge>
-                    )}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-80 p-0" align="end">
-                  <div className="p-4 border-b">
-                    <div className="font-medium">Notifications</div>
-                  </div>
-                  <div className="max-h-80 overflow-y-auto">
-                    {sampleNotifications.length > 0 ? (
-                      <div className="divide-y">
-                        {sampleNotifications.map((notification) => (
-                          <div 
-                            key={notification.id} 
-                            className={`p-4 hover:bg-muted cursor-pointer ${notification.read ? '' : 'bg-muted/50'}`}
-                          >
-                            <div className="flex justify-between">
-                              <h4 className="text-sm font-medium">{notification.title}</h4>
-                              <span className="text-xs text-muted-foreground">{notification.time}</span>
-                            </div>
-                            <p className="text-sm text-muted-foreground mt-1">{notification.text}</p>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="p-4 text-center text-muted-foreground">
-                        No new notifications
-                      </div>
-                    )}
-                  </div>
-                  <div className="p-2 border-t text-center">
-                    <Button variant="ghost" size="sm" className="w-full text-primary text-xs">Mark all as read</Button>
-                  </div>
-                </PopoverContent>
-              </Popover>
+              <Link to="/notifications">
+                <Button variant="ghost" size="icon" className="relative">
+                  <Bell className="h-5 w-5" />
+                  {sampleNotifications.filter(n => !n.read).length > 0 && (
+                    <Badge className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 bg-destructive text-white rounded-full">
+                      {sampleNotifications.filter(n => !n.read).length}
+                    </Badge>
+                  )}
+                </Button>
+              </Link>
               
               <Link to="/cart" className="relative">
                 <Button variant="ghost" size="icon">
@@ -163,7 +133,7 @@ export function Navbar({
                     <Link to="/account/orders" className="w-full cursor-pointer">Orders</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link to="/account/wishlist" className="w-full cursor-pointer">Wishlist</Link>
+                    <Link to="/wishlist" className="w-full cursor-pointer">Wishlist</Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
@@ -306,11 +276,18 @@ export function Navbar({
                     My Orders
                   </Link>
                   <Link 
-                    to="/account/wishlist" 
+                    to="/wishlist" 
                     className="py-2 text-gray-700 hover:text-primary"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Wishlist
+                  </Link>
+                  <Link 
+                    to="/notifications" 
+                    className="py-2 text-gray-700 hover:text-primary"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Notifications
                   </Link>
                   <Link 
                     to="/logout" 

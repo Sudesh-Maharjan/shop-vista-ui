@@ -7,12 +7,12 @@ import { toast } from 'sonner';
 // Add to cart function for global access
 declare global {
   interface Window {
-    addToCart: () => void;
+    addToCart: (productId?: number) => void;
   }
 }
 
 // Default implementation
-window.addToCart = () => {
+window.addToCart = (productId?: number) => {
   toast.success('Item added to cart');
 };
 

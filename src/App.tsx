@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -17,6 +18,8 @@ import CartPage from "./pages/public/cart";
 import CheckoutPage from "./pages/public/checkout";
 import OrderConfirmationPage from "./pages/public/order-confirmation";
 import WishlistPage from "./pages/public/wishlist";
+import NotificationsPage from "./pages/public/notifications";
+import OrdersPage from "./pages/public/orders";
 import ProfilePage from "./pages/public/profile";
 import OrderTrackingPage from "./pages/public/order-tracking";
 
@@ -47,7 +50,6 @@ const PlaceholderPage = ({ title }: { title: string }) => (
 );
 
 // User account pages (some implemented, others as placeholders)
-const OrdersPage = () => <PlaceholderPage title="My Orders" />;
 const OrderDetailPage = () => <PlaceholderPage title="Order Details" />;
 const AddressesPage = () => <PlaceholderPage title="My Addresses" />;
 const ChangePasswordPage = () => <PlaceholderPage title="Change Password" />;
@@ -95,7 +97,7 @@ const App = () => {
               <Route path="/order-confirmation/:id" element={<OrderConfirmationPage />} />
               <Route path="/order-tracking/:id" element={<OrderTrackingPage />} />
               <Route path="/wishlist" element={<WishlistPage />} />
-              <Route path="/notifications" element={<PlaceholderPage title="Notifications" />} />
+              <Route path="/notifications" element={<NotificationsPage />} />
               
               {/* Protected account routes */}
               <Route path="/account/profile" element={
