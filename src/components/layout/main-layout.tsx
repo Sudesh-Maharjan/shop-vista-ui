@@ -1,4 +1,5 @@
 
+import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Navbar } from './navbar';
 import { Footer } from './footer';
@@ -6,6 +7,7 @@ import { cart } from '@/lib/data';
 import { Toaster } from '@/components/ui/toaster';
 import { Toaster as SonnerToaster } from '@/components/ui/sonner';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { toast } from 'sonner';
 
 interface MainLayoutProps {
   isAuthenticated?: boolean;
@@ -13,14 +15,25 @@ interface MainLayoutProps {
 }
 
 export function MainLayout({ isAuthenticated = false, userName = 'Guest' }: MainLayoutProps) {
-  // In a real app, this would come from a context or state management
-  const cartItemCount = cart.items.reduce((acc, item) => acc + item.quantity, 0);
+  // Use state to track cart item count for UI updates
+  const [cartItemCount, setCartItemCount] = useState(
+    cart.items.reduce((acc, item) => acc + item.quantity, 0)
+  );
   
   const handleSearchSubmit = (query: string) => {
     // In a real app, this would navigate to search results
     console.log('Search submitted:', query);
     window.location.href = `/search?q=${encodeURIComponent(query)}`;
   };
+
+  // Add to cart function that updates the state
+  const handleAddToCart = () => {
+    setCartItemCount(prev => prev + 1);
+    toast.success('Item added to cart');
+  };
+
+  // Set global addToCart function
+  window.addToCart = handleAddToCart;
 
   return (
     <div className="flex flex-col min-h-screen">

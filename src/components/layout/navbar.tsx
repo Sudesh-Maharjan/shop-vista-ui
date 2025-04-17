@@ -17,6 +17,13 @@ import { categories } from '@/lib/data';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { toast } from 'sonner';
 
+interface NavbarProps {
+  isAuthenticated?: boolean;
+  userName?: string;
+  cartItemCount?: number;
+  onSearchSubmit?: (query: string) => void;
+}
+
 const sampleNotifications = [
   { id: 1, title: 'Order Shipped', text: 'Your order #12345 has been shipped', time: '5 mins ago', read: false },
   { id: 2, title: 'Price Drop', text: 'A product in your wishlist is now on sale', time: '2 hours ago', read: false },
