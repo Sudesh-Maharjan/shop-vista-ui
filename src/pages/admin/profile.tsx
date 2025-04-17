@@ -20,6 +20,14 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { toast } from 'sonner';
 import { currentUser } from '@/lib/data';
 
+// Extended user with additional fields needed for the profile page
+const extendedUser = {
+  ...currentUser,
+  phone: '(555) 123-4567',
+  jobTitle: 'Administrator',
+  avatarUrl: 'https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=400&h=400&q=80'
+};
+
 // Form validation schema
 const profileSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters' }),
@@ -48,10 +56,10 @@ const AdminProfilePage = () => {
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      name: currentUser.name,
-      email: currentUser.email,
-      phone: currentUser.phone || '',
-      jobTitle: currentUser.jobTitle || '',
+      name: extendedUser.name,
+      email: extendedUser.email,
+      phone: extendedUser.phone || '',
+      jobTitle: extendedUser.jobTitle || '',
       password: '',
       newPassword: '',
       confirmPassword: '',
@@ -232,14 +240,14 @@ const AdminProfilePage = () => {
             <CardContent className="pt-6">
               <div className="flex flex-col items-center text-center">
                 <Avatar className="h-24 w-24 mb-4">
-                  <AvatarImage src={currentUser.avatarUrl} alt={currentUser.name} />
+                  <AvatarImage src={extendedUser.avatarUrl} alt={extendedUser.name} />
                   <AvatarFallback className="text-2xl">
                     <User className="h-12 w-12" />
                   </AvatarFallback>
                 </Avatar>
                 
-                <h3 className="font-medium text-lg">{currentUser.name}</h3>
-                <p className="text-muted-foreground">{currentUser.jobTitle || 'Administrator'}</p>
+                <h3 className="font-medium text-lg">{extendedUser.name}</h3>
+                <p className="text-muted-foreground">{extendedUser.jobTitle || 'Administrator'}</p>
                 
                 <div className="w-full mt-6">
                   <Button variant="outline" className="w-full">

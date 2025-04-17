@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
 import { categories } from '@/lib/data';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 interface NavbarProps {
   isAuthenticated?: boolean;
@@ -22,6 +23,14 @@ interface NavbarProps {
   cartItemCount?: number;
   onSearchSubmit?: (query: string) => void;
 }
+
+// Sample notifications for the dropdown
+const sampleNotifications = [
+  { id: 1, title: 'Order Shipped', text: 'Your order #12345 has been shipped', time: '5 mins ago', read: false },
+  { id: 2, title: 'Price Drop', text: 'A product in your wishlist is now on sale', time: '2 hours ago', read: false },
+  { id: 3, title: 'New Feature', text: 'Check out our new recommendation system', time: '1 day ago', read: true },
+  { id: 4, title: 'Review Request', text: 'Please review your recent purchase', time: '3 days ago', read: true },
+];
 
 export function Navbar({ 
   isAuthenticated = false, 
@@ -32,6 +41,7 @@ export function Navbar({
   const [searchQuery, setSearchQuery] = useState('');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showSearchBar, setShowSearchBar] = useState(false);
+  const [localCartCount, setLocalCartCount] = useState(cartItemCount);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,6 +49,14 @@ export function Navbar({
       onSearchSubmit(searchQuery);
     }
   };
+
+  const handleAddToCart = () => {
+    setLocalCartCount(prev => prev + 1);
+    toast.success('Item added to cart');
+  };
+
+  // Add this to the global scope of your component
+  window.addToCart = handleAddToCart;
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white border-b shadow-sm">
@@ -82,17 +100,57 @@ export function Navbar({
                   <Heart className="h-5 w-5" />
                 </Button>
               </Link>
-              <Link to="/notifications">
-                <Button variant="ghost" size="icon">
-                  <Bell className="h-5 w-5" />
-                </Button>
-              </Link>
+              
+              {/* Notifications Popover */}
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="ghost" size="icon" className="relative">
+                    <Bell className="h-5 w-5" />
+                    {sampleNotifications.filter(n => !n.read).length > 0 && (
+                      <Badge className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 bg-destructive text-white rounded-full">
+                        {sampleNotifications.filter(n => !n.read).length}
+                      </Badge>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-80 p-0" align="end">
+                  <div className="p-4 border-b">
+                    <div className="font-medium">Notifications</div>
+                  </div>
+                  <div className="max-h-80 overflow-y-auto">
+                    {sampleNotifications.length > 0 ? (
+                      <div className="divide-y">
+                        {sampleNotifications.map((notification) => (
+                          <div 
+                            key={notification.id} 
+                            className={`p-4 hover:bg-muted cursor-pointer ${notification.read ? '' : 'bg-muted/50'}`}
+                          >
+                            <div className="flex justify-between">
+                              <h4 className="text-sm font-medium">{notification.title}</h4>
+                              <span className="text-xs text-muted-foreground">{notification.time}</span>
+                            </div>
+                            <p className="text-sm text-muted-foreground mt-1">{notification.text}</p>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="p-4 text-center text-muted-foreground">
+                        No new notifications
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-2 border-t text-center">
+                    <Button variant="ghost" size="sm" className="w-full text-primary text-xs">Mark all as read</Button>
+                  </div>
+                </PopoverContent>
+              </Popover>
+              
               <Link to="/cart" className="relative">
                 <Button variant="ghost" size="icon">
                   <ShoppingCart className="h-5 w-5" />
-                  {cartItemCount > 0 && (
+                  {localCartCount > 0 && (
                     <Badge className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 bg-primary text-white rounded-full">
-                      {cartItemCount}
+                      {localCartCount}
                     </Badge>
                   )}
                 </Button>
@@ -126,9 +184,9 @@ export function Navbar({
               <Link to="/cart" className="relative">
                 <Button variant="ghost" size="icon">
                   <ShoppingCart className="h-5 w-5" />
-                  {cartItemCount > 0 && (
+                  {localCartCount > 0 && (
                     <Badge className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 bg-primary text-white rounded-full">
-                      {cartItemCount}
+                      {localCartCount}
                     </Badge>
                   )}
                 </Button>
@@ -156,9 +214,9 @@ export function Navbar({
           <Link to="/cart" className="relative">
             <Button variant="ghost" size="icon">
               <ShoppingCart className="h-5 w-5" />
-              {cartItemCount > 0 && (
+              {localCartCount > 0 && (
                 <Badge className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 bg-primary text-white rounded-full">
-                  {cartItemCount}
+                  {localCartCount}
                 </Badge>
               )}
             </Button>

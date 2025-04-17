@@ -18,6 +18,7 @@ import CheckoutPage from "./pages/public/checkout";
 import OrderConfirmationPage from "./pages/public/order-confirmation";
 import WishlistPage from "./pages/public/wishlist";
 import ProfilePage from "./pages/public/profile";
+import OrderTrackingPage from "./pages/public/order-tracking";
 
 // Admin pages
 import AdminDashboardPage from "./pages/admin/dashboard";
@@ -32,6 +33,7 @@ import AdminProfilePage from "./pages/admin/profile";
 
 // Auth pages
 import LoginPage from "./pages/auth/login";
+import RegisterPage from "./pages/auth/register";
 
 // Other pages
 import NotFound from "./pages/NotFound";
@@ -44,9 +46,6 @@ const PlaceholderPage = ({ title }: { title: string }) => (
   </div>
 );
 
-// Auth pages
-const RegisterPage = () => <PlaceholderPage title="Register" />;
-
 // User account pages (some implemented, others as placeholders)
 const OrdersPage = () => <PlaceholderPage title="My Orders" />;
 const OrderDetailPage = () => <PlaceholderPage title="Order Details" />;
@@ -55,9 +54,6 @@ const ChangePasswordPage = () => <PlaceholderPage title="Change Password" />;
 
 // Admin order detail page
 const AdminOrderDetailPage = () => <PlaceholderPage title="Order Details" />;
-
-// For tracking pages
-const OrderTrackingPage = () => <PlaceholderPage title="Order Tracking" />;
 
 const queryClient = new QueryClient();
 
@@ -99,6 +95,7 @@ const App = () => {
               <Route path="/order-confirmation/:id" element={<OrderConfirmationPage />} />
               <Route path="/order-tracking/:id" element={<OrderTrackingPage />} />
               <Route path="/wishlist" element={<WishlistPage />} />
+              <Route path="/notifications" element={<PlaceholderPage title="Notifications" />} />
               
               {/* Protected account routes */}
               <Route path="/account/profile" element={

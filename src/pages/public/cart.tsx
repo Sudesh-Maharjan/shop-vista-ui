@@ -31,6 +31,11 @@ const CartPage = () => {
         item.productId === itemId ? { ...item, quantity: newQuantity } : item
       )
     );
+    
+    if (window.addToCart) {
+      // Update the global cart counter in navbar
+      window.addToCart();
+    }
   };
   
   const handleRemoveItem = (itemId: number) => {
@@ -86,7 +91,9 @@ const CartPage = () => {
                     <div key={item.productId} className="p-4 flex flex-col sm:flex-row gap-4">
                       <div className="relative aspect-square w-24 h-24 flex-shrink-0 bg-gray-100 rounded-md overflow-hidden">
                         <img 
-                          src={item.image.replace('/placeholder.svg', 'https://images.unsplash.com/photo-1546868871-7041f2a55e12?q=80&w=300')} 
+                          src={item.image.includes('/placeholder.svg') ? 
+                                'https://images.unsplash.com/photo-1546868871-7041f2a55e12?q=80&w=300' : 
+                                item.image} 
                           alt={item.name} 
                           className="w-full h-full object-cover"
                         />
